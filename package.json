@@ -3,5 +3,26 @@
   "version": "1.0.0",
   "repository": "https://github.com/hellodhlyn/dukebox.git",
   "author": "Hoerin Doh <lyn@lynlab.co.kr>",
-  "license": "MIT"
+  "license": "MIT",
+  "main": "dist/index.js",
+  "scripts": {
+    "prebuild": "rimraf ./dist",
+    "build": "tsc",
+    "start": "node ."
+  },
+  "dependencies": {
+    "@discordjs/opus": "^0.5.3",
+    "bufferutil": "^4.0.3",
+    "discord.js": "^12.5.3",
+    "erlpack": "discord/erlpack",
+    "libsodium-wrappers": "^0.7.9",
+    "utf-8-validate": "^5.0.5",
+    "zlib-sync": "^0.1.7"
+  },
+  "devDependencies": {
+    "@types/node": "^15.12.5",
+    "@types/ws": "^7.4.5",
+    "rimraf": "^3.0.2",
+    "typescript": "^4.3.4"
+  }
 }

@@ -126,4 +126,5 @@ dist
 
 .idea/
 .code/
+.envrc
 
