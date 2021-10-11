@@ -44,10 +44,11 @@ export class Bot {
 
         case 'leave':
           await this.leave();
+          res = { reaction: '👋' };
           break;
 
         default:
-          res = { reaction: '?' };
+          res = { reaction: '❓' };
       }
 
       if (res?.message) {
