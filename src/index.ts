@@ -1,38 +1,19 @@
 import { Client, VoiceConnection, VoiceChannel, StreamDispatcher, Message } from 'discord.js';
 import ytdl, { MoreVideoDetails } from 'ytdl-core';
+import Playlist from './playlist';
 
 const client = new Client();
 let connection: VoiceConnection = null;
 let dispatcher: StreamDispatcher = null;
 
-//
-// Playlist
-//
-class PlaylistItem {
-  title: string;
-  link: string;
+const playlistClass = new Playlist();
 
-  constructor(title: string, link: string) {
-    this.title = title;
-    this.link = link;
-  }
-}
-
-const playlist: PlaylistItem[] = [];
-
-function appendToPlaylist(item: PlaylistItem) {
-  playlist.push(item);
-  if (!dispatcher) {
-    play(0);
-  }
-}
-
-function play(index: number) {
-  const item = playlist[index % playlist.length];
+function play() {
+  const item = playlistClass.pop();
   const stream = ytdl(item.link, { filter: 'audioonly' });
   dispatcher = connection.play(stream, { volume: 0.7 });
   dispatcher.on('close', () => {
-    play(index + 1);
+    play();
   });
 }
 
@@ -47,7 +28,7 @@ client.on('ready', async () => {
 });
 
 client.on('message', async (message: Message) => {
-  const messageArgs = message.content.split(" ");
+  const messageArgs = message.content.split(' ');
   if (messageArgs[0] !== '/dukebox') {
     return;
   }
@@ -69,13 +50,18 @@ client.on('message', async (message: Message) => {
         break;
       }
 
-      appendToPlaylist(new PlaylistItem(info.title, videoUrl));
+      playlistClass.push(info.title, videoUrl);
       await message.react('👌');
+
+      if (!dispatcher) {
+        play();
+      }
       break;
 
     // /dukebox list
     case 'list':
-      await message.reply('```' + playlist.map((item, idx) => `[${idx < 10 ? '0' + idx : idx}] ${item.title}`).join('\n') + '```');
+      const items = playlistClass.list();
+      await message.reply('```' + items.map((item, idx) => `[${idx < 10 ? '0' + idx : idx}] ${item.title}`).join('\n') + '```');
       break;
 
     // /dukebox remove [index]
@@ -85,13 +71,7 @@ client.on('message', async (message: Message) => {
         break;
       }
 
-      const index = Number(messageArgs[2]);
-      if (isNaN(index) || index >= playlist.length) {
-        await message.reply('Out of index.');
-        break;
-      }
-
-      playlist.splice(index, 1);
+      playlistClass.remove(Number(messageArgs[2]));
       await message.react('👌');
       break;
 
