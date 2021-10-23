@@ -24,7 +24,7 @@ export class Bot {
 
     this.client.on('message', async (message: Message) => {
       const args = message.content.split(' ');
-      if (args[0] !== '/dukebox') {
+      if (['/dukebox', '/d'].includes(args[0])) {
         return;
       }
 
