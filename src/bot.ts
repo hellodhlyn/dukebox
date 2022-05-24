@@ -1,6 +1,13 @@
 import { Client, Message, VoiceChannel, VoiceConnection } from 'discord.js';
 import ytdl from 'ytdl-core';
 
+const helpMessage = `\`\`\`
+/d add [url]
+/d list
+/d remove [index]
+/d leave
+\`\`\``;
+
 export class BotResponse {
   message?: string;
   reaction?: string;
@@ -24,7 +31,7 @@ export class Bot {
 
     this.client.on('message', async (message: Message) => {
       const args = message.content.split(' ');
-      if (['/dukebox', '/d'].includes(args[0])) {
+      if (!['/dukebox', '/d'].includes(args[0])) {
         return;
       }
 
@@ -45,6 +52,11 @@ export class Bot {
         case 'leave':
           await this.leave();
           res = { reaction: '👋' };
+          break;
+
+        case 'help':
+        case '?':
+          res = { message: helpMessage };
           break;
 
         default:
