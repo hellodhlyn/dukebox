@@ -2,10 +2,12 @@ import { Client, Message, VoiceChannel, VoiceConnection } from 'discord.js';
 import ytdl from 'ytdl-core';
 
 const helpMessage = `\`\`\`
-/d add [url]
-/d list
-/d remove [index]
-/d leave
+/dukebox add [video-url]
+/dukebox addall [playlist-url]
+/dukebox list
+/dukebox shuffle
+/dukebox remove [index]
+/dukebox leave
 \`\`\``;
 
 export class BotResponse {
@@ -22,7 +24,9 @@ export class Bot {
   private _isPlaying = false;
 
   private onAddCallback: (url: string) => Promise<BotResponse>;
+  private onAddAllCallback: (url: string) => Promise<BotResponse>;
   private onListCallback: () => Promise<BotResponse>;
+  private onShuffleCallback: () => Promise<BotResponse>;
   private onRemoveCallback: (index: number) => Promise<BotResponse>;
 
   constructor(token: string, channelId: string) {
@@ -38,7 +42,11 @@ export class Bot {
       let res: BotResponse;
       switch (args[1]) {
         case 'add':
-          res = (args.length === 3) ? await this.onAddCallback(args[2]) : { message: '/dukebox add [url]' };
+          res = (args.length === 3) ? await this.onAddCallback(args[2]) : { message: '/dukebox add [video-url]' };
+          break;
+
+        case 'addall':
+          res = (args.length === 3) ? await this.onAddAllCallback(args[2]) : { message: '/dukebox addall [playlist-url]' };
           break;
 
         case 'list':
@@ -52,6 +60,10 @@ export class Bot {
         case 'leave':
           await this.leave();
           res = { reaction: '👋' };
+          break;
+
+        case 'shuffle':
+          res = await this.onShuffleCallback();
           break;
 
         case 'help':
@@ -111,8 +123,16 @@ export class Bot {
     this.onAddCallback = callback;
   }
 
+  onAddAll(callback: (url: string) => Promise<BotResponse>) {
+    this.onAddAllCallback = callback;
+  }
+
   onList(callback: () => Promise<BotResponse>) {
     this.onListCallback = callback;
+  }
+
+  onShuffle(callback: () => Promise<BotResponse>) {
+    this.onShuffleCallback = callback;
   }
 
   onRemove(callback: (index: number) => Promise<BotResponse>) {

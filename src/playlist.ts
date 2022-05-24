@@ -25,6 +25,13 @@ export default class Playlist {
     return this.items;
   }
 
+  shuffle() {
+    for (let i = this.items.length - 1; i > 0; i--) {
+      const j = Math.floor(Math.random() * (i + 1));
+      [this.items[i], this.items[j]] = [this.items[j], this.items[i]];
+    }
+  }
+
   remove(index: number) {
     if (index < this.items.length) {
       this.items.splice(index, 1);

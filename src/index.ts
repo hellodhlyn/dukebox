@@ -1,4 +1,5 @@
 import ytdl, { MoreVideoDetails } from 'ytdl-core';
+import ytpl from 'ytpl';
 import Playlist from './playlist';
 import { Bot, BotResponse } from './bot';
 
@@ -37,10 +38,37 @@ bot.onAdd(async (url: string): Promise<BotResponse> => {
   return { reaction : '👌' };
 });
 
+bot.onAddAll(async (playlistUrl: string): Promise<BotResponse> => {
+  const videoList = await ytpl(playlistUrl);
+  for (const video of videoList.items) {
+    let info: MoreVideoDetails;
+    try {
+      info = (await ytdl.getInfo(video.url)).videoDetails;
+    } catch (e) {
+      // Ignored
+    }
+
+    playlist.push(info.title, video.url);
+    if (!bot.isPlaying) {
+      await play();
+    }
+  }
+
+  return { reaction : '👌' };
+});
+
 bot.onList(async (): Promise<BotResponse> => {
   const items = playlist.list();
-  const message = '```' + items.map((item, idx) => `[${idx < 10 ? '0' + idx : idx}] ${item.title}`).join('\n') + '```';
+  const message = '```'
+    + items.slice(0, 10).map((item, idx) => `[${idx < 10 ? '0' + idx : idx}] ${item.title}`).join('\n')
+    + `${items.length > 10 ? `... and ${items.length - 10} more` : ''}`
+    + '```';
   return { message };
+});
+
+bot.onShuffle(async (): Promise<BotResponse> => {
+  playlist.shuffle();
+  return { reaction: '👌' };
 });
 
 bot.onRemove(async (index: number): Promise<BotResponse> => {
