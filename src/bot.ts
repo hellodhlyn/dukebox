@@ -2,7 +2,8 @@ import { Client, Message, VoiceChannel, VoiceConnection } from 'discord.js';
 import ytdl from 'ytdl-core';
 
 const helpMessage = `\`\`\`
-/d add [url]
+/d add [video-url]
+/d addall [playlist-url]
 /d list
 /d remove [index]
 /d leave
@@ -22,6 +23,7 @@ export class Bot {
   private _isPlaying = false;
 
   private onAddCallback: (url: string) => Promise<BotResponse>;
+  private onAddAllCallback: (url: string) => Promise<BotResponse>;
   private onListCallback: () => Promise<BotResponse>;
   private onRemoveCallback: (index: number) => Promise<BotResponse>;
 
@@ -38,7 +40,11 @@ export class Bot {
       let res: BotResponse;
       switch (args[1]) {
         case 'add':
-          res = (args.length === 3) ? await this.onAddCallback(args[2]) : { message: '/dukebox add [url]' };
+          res = (args.length === 3) ? await this.onAddCallback(args[2]) : { message: '/dukebox add [video-url]' };
+          break;
+
+        case 'addall':
+          res = (args.length === 3) ? await this.onAddAllCallback(args[2]) : { message: '/dukebox addall [playlist-url]' };
           break;
 
         case 'list':
@@ -109,6 +115,10 @@ export class Bot {
 
   onAdd(callback: (url: string) => Promise<BotResponse>) {
     this.onAddCallback = callback;
+  }
+
+  onAddAll(callback: (url: string) => Promise<BotResponse>) {
+    this.onAddAllCallback = callback;
   }
 
   onList(callback: () => Promise<BotResponse>) {

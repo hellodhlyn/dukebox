@@ -11,13 +11,14 @@
     "start": "node ."
   },
   "dependencies": {
-    "@discordjs/opus": "^0.5.3",
+    "@discordjs/opus": "^0.7.0",
     "bufferutil": "^4.0.3",
     "discord.js": "^12.5.3",
     "erlpack": "discord/erlpack",
     "libsodium-wrappers": "^0.7.9",
     "utf-8-validate": "^5.0.5",
     "ytdl-core": "^4.8.3",
+    "ytpl": "^2.3.0",
     "zlib-sync": "^0.1.7"
   },
   "devDependencies": {

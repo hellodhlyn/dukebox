@@ -1,4 +1,5 @@
 import ytdl, { MoreVideoDetails } from 'ytdl-core';
+import ytpl from 'ytpl';
 import Playlist from './playlist';
 import { Bot, BotResponse } from './bot';
 
@@ -32,6 +33,25 @@ bot.onAdd(async (url: string): Promise<BotResponse> => {
   playlist.push(info.title, url)
   if (!bot.isPlaying) {
     await play();
+  }
+
+  return { reaction : '👌' };
+});
+
+bot.onAddAll(async (playlistUrl: string): Promise<BotResponse> => {
+  const videoList = await ytpl(playlistUrl);
+  for (const video of videoList.items) {
+    let info: MoreVideoDetails;
+    try {
+      info = (await ytdl.getInfo(video.url)).videoDetails;
+    } catch (e) {
+      // Ignored
+    }
+
+    playlist.push(info.title, video.url);
+    if (!bot.isPlaying) {
+      await play();
+    }
   }
 
   return { reaction : '👌' };
