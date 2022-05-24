@@ -59,8 +59,16 @@ bot.onAddAll(async (playlistUrl: string): Promise<BotResponse> => {
 
 bot.onList(async (): Promise<BotResponse> => {
   const items = playlist.list();
-  const message = '```' + items.map((item, idx) => `[${idx < 10 ? '0' + idx : idx}] ${item.title}`).join('\n') + '```';
+  const message = '```'
+    + items.slice(0, 10).map((item, idx) => `[${idx < 10 ? '0' + idx : idx}] ${item.title}`).join('\n')
+    + `${items.length > 10 ? `... and ${items.length - 10} more` : ''}`
+    + '```';
   return { message };
+});
+
+bot.onShuffle(async (): Promise<BotResponse> => {
+  playlist.shuffle();
+  return { reaction: '👌' };
 });
 
 bot.onRemove(async (index: number): Promise<BotResponse> => {

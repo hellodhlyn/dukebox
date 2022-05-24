@@ -2,11 +2,12 @@ import { Client, Message, VoiceChannel, VoiceConnection } from 'discord.js';
 import ytdl from 'ytdl-core';
 
 const helpMessage = `\`\`\`
-/d add [video-url]
-/d addall [playlist-url]
-/d list
-/d remove [index]
-/d leave
+/dukebox add [video-url]
+/dukebox addall [playlist-url]
+/dukebox list
+/dukebox shuffle
+/dukebox remove [index]
+/dukebox leave
 \`\`\``;
 
 export class BotResponse {
@@ -25,6 +26,7 @@ export class Bot {
   private onAddCallback: (url: string) => Promise<BotResponse>;
   private onAddAllCallback: (url: string) => Promise<BotResponse>;
   private onListCallback: () => Promise<BotResponse>;
+  private onShuffleCallback: () => Promise<BotResponse>;
   private onRemoveCallback: (index: number) => Promise<BotResponse>;
 
   constructor(token: string, channelId: string) {
@@ -58,6 +60,10 @@ export class Bot {
         case 'leave':
           await this.leave();
           res = { reaction: '👋' };
+          break;
+
+        case 'shuffle':
+          res = await this.onShuffleCallback();
           break;
 
         case 'help':
@@ -123,6 +129,10 @@ export class Bot {
 
   onList(callback: () => Promise<BotResponse>) {
     this.onListCallback = callback;
+  }
+
+  onShuffle(callback: () => Promise<BotResponse>) {
+    this.onShuffleCallback = callback;
   }
 
   onRemove(callback: (index: number) => Promise<BotResponse>) {
