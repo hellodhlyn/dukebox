@@ -112,7 +112,7 @@ export class Bot {
 
     this._isPlaying = true;
     const stream = ytdl(url, { filter: 'audioonly' });
-    const dispatcher = this.connection.play(stream, { volume: 0.7 });
+    const dispatcher = this.connection.play(stream, { volume: 0.2 });
     dispatcher.on('close', () => {
       this._isPlaying = false;
       onFinish();
